@@ -4,10 +4,14 @@
 #include "gl_errors.hpp"
 #include "data_path.hpp"
 #include "hex_dump.hpp"
+#include "DrawText.hpp"
+#include "Mesh.hpp"
+#include "Load.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
 
 #include <random>
+
 
 PlayMode::PlayMode(Client &client_) : client(client_) {
 }
