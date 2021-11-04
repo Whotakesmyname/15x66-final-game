@@ -15,6 +15,8 @@
 
 
 PlayMode::PlayMode(Client &client_) : drawable_size({1280U, 720U}), client(client_) {
+	// sample hardcoded map components
+
 	size_t index;
 	index = tile_drawer.add_component(TileDrawer::Square{
 	glm::vec2(drawable_size.x / 2.f, drawable_size.y - 20), // position/center
@@ -36,6 +38,46 @@ PlayMode::PlayMode(Client &client_) : drawable_size({1280U, 720U}), client(clien
 	tile_drawer.update_vertices(TileDrawer::MAP);
 	map_components.push_back(index);
 	collider.add_component(glm::vec2(drawable_size.x / 2, drawable_size.y - 160), glm::vec2(400, 40));
+
+	index = tile_drawer.add_component(TileDrawer::Square{
+		glm::vec2(drawable_size.x / 2 + 500, drawable_size.y - 250),
+		glm::vec2(400, 40),
+		glm::vec2(),
+		glm::vec2()
+	}, TileDrawer::MAP);
+	tile_drawer.update_vertices(TileDrawer::MAP);
+	map_components.push_back(index);
+	collider.add_component(glm::vec2(drawable_size.x / 2 + 500, drawable_size.y - 250), glm::vec2(400, 40));
+
+	index = tile_drawer.add_component(TileDrawer::Square{
+		glm::vec2(drawable_size.x / 2 - 500, drawable_size.y - 250),
+		glm::vec2(400, 40),
+		glm::vec2(),
+		glm::vec2()
+	}, TileDrawer::MAP);
+	tile_drawer.update_vertices(TileDrawer::MAP);
+	map_components.push_back(index);
+	collider.add_component(glm::vec2(drawable_size.x / 2 - 500, drawable_size.y - 250), glm::vec2(400, 40));
+
+	index = tile_drawer.add_component(TileDrawer::Square{
+		glm::vec2(drawable_size.x / 2 + 60, drawable_size.y - 480),
+		glm::vec2(40, 400),
+		glm::vec2(),
+		glm::vec2()
+	}, TileDrawer::MAP);
+	tile_drawer.update_vertices(TileDrawer::MAP);
+	map_components.push_back(index);
+	collider.add_component(glm::vec2(drawable_size.x / 2 + 60, drawable_size.y - 480), glm::vec2(40, 400));
+
+	index = tile_drawer.add_component(TileDrawer::Square{
+		glm::vec2(drawable_size.x / 2 - 60, drawable_size.y - 400),
+		glm::vec2(40, 400),
+		glm::vec2(),
+		glm::vec2()
+	}, TileDrawer::MAP);
+	tile_drawer.update_vertices(TileDrawer::MAP);
+	map_components.push_back(index);
+	collider.add_component(glm::vec2(drawable_size.x / 2 - 60, drawable_size.y - 400), glm::vec2(40, 400));
 
 	index = tile_drawer.add_component(TileDrawer::Square{
 		glm::vec2(drawable_size.x / 2 + 50, drawable_size.y - 60),
