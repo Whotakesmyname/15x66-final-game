@@ -12,7 +12,6 @@ std::pair<bool, glm::vec2> Collider::solve_collision(glm::vec2 center, glm::vec2
 {
     glm::vec2 upperleft = center - size / 2.f;
     glm::vec2 lowerright = center + size / 2.f;
-    std::pair<bool, glm::vec2> res;
 
     for (auto &box : map_components)
     {
