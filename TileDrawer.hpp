@@ -17,7 +17,7 @@ public:
     };
     
     enum ATTR_LOCS : GLuint {
-        POSTION = 0U,
+        POSITION = 0U,
         TEXCOORD = 1U,
     };
 

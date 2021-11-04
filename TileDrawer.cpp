@@ -42,8 +42,8 @@ TileDrawer::TileDrawer() {
     for (size_t queue = 0; queue < RENDER_QUEUE_SIZE; ++queue) {
         glBindBuffer(GL_ARRAY_BUFFER, vbos[queue]);
         glBindVertexArray(vaos[queue]);
-        glVertexAttribPointer(POSTION, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid *)0);
-        glEnableVertexAttribArray(POSTION);
+        glVertexAttribPointer(POSITION, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid *)0);
+        glEnableVertexAttribArray(POSITION);
         glVertexAttribPointer(TEXCOORD, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid *)(2 * sizeof(GLfloat)));
         glEnableVertexAttribArray(TEXCOORD);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
