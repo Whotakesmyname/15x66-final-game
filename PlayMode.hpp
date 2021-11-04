@@ -25,6 +25,11 @@ struct PlayMode : Mode {
 
 	//----- game state -----
 
+	// scene components
+	std::vector<size_t> background;
+	std::vector<size_t> map_components;
+	size_t self_index;
+
 	// player state
 	struct PlayerState
 	{
@@ -40,7 +45,7 @@ struct PlayMode : Mode {
 	struct Button {
 		uint8_t downs = 0;
 		uint8_t pressed = 0;
-	} left, right, down, up;
+	} left, right, down, up, jump;
 
 	//last message from server:
 	std::string server_message;

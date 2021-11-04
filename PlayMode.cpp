@@ -15,7 +15,8 @@
 
 
 PlayMode::PlayMode(Client &client_) : drawable_size({1280U, 720U}), client(client_) {
-	tile_drawer.add_component(TileDrawer::Square{
+	size_t index;
+	index = tile_drawer.add_component(TileDrawer::Square{
 	glm::vec2(drawable_size.x / 2.f, drawable_size.y - 20), // position/center
 	glm::vec2(drawable_size.x, 40), // size (x, y)
 	glm::vec2(), // uv coord upper left
@@ -23,22 +24,28 @@ PlayMode::PlayMode(Client &client_) : drawable_size({1280U, 720U}), client(clien
 	}, TileDrawer::BACKGROUND); // rendering queue
 	// convert component data to vertices and push to GPU
 	tile_drawer.update_vertices(TileDrawer::BACKGROUND);
+	background.push_back(index);
 
-	tile_drawer.add_component(TileDrawer::Square{
+	index = tile_drawer.add_component(TileDrawer::Square{
 		glm::vec2(drawable_size.x / 2, drawable_size.y - 160),
 		glm::vec2(400, 40),
 		glm::vec2(),
 		glm::vec2()
 	}, TileDrawer::MAP);
 	tile_drawer.update_vertices(TileDrawer::MAP);
+	map_components.push_back(index);
 
-	tile_drawer.add_component(TileDrawer::Square{
+	index = tile_drawer.add_component(TileDrawer::Square{
 		glm::vec2(drawable_size.x / 2 + 50, drawable_size.y - 60),
 		glm::vec2(40, 80),
 		glm::vec2(),
 		glm::vec2()
 	}, TileDrawer::CHARACTER);
 	tile_drawer.update_vertices(TileDrawer::CHARACTER);
+	self_index = index;
+
+	player.position = tile_drawer.components[TileDrawer::CHARACTER][self_index].position;
+	player.velocity = glm::vec2(0.f);
 }
 
 PlayMode::~PlayMode() {
@@ -65,6 +72,9 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			down.downs += 1;
 			down.pressed = true;
 			return true;
+		} else if (evt.key.keysym.sym == SDLK_SPACE) {
+			jump.downs += 1;
+			jump.pressed = true;
 		}
 	} else if (evt.type == SDL_KEYUP) {
 		if (evt.key.keysym.sym == SDLK_a) {
@@ -79,6 +89,8 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 		} else if (evt.key.keysym.sym == SDLK_s) {
 			down.pressed = false;
 			return true;
+		} else if (evt.key.keysym.sym == SDLK_SPACE) {
+			jump.pressed = false;
 		}
 	}
 
@@ -86,6 +98,18 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 }
 
 void PlayMode::update(float elapsed) {
+
+	glm::vec2 move = glm::vec2(0.f);
+	if (left.pressed && !right.pressed) move.x = -100.f;
+	if (!left.pressed && right.pressed) move.x = 100.f;
+	if (jump.pressed) player.velocity.y = -250.f;
+
+	// update gravity
+	player.position += move * elapsed;
+	player.position += player.velocity * elapsed;
+	player.velocity.y += 200.f * elapsed;
+
+	tile_drawer.components[TileDrawer::CHARACTER][self_index].position = player.position;
 
 	//queue data for sending to server:
 	//TODO: send something that makes sense for your game
@@ -133,6 +157,8 @@ void PlayMode::update(float elapsed) {
 		}
 	}, 0.0);
 	
+	// update vertice
+	tile_drawer.update_vertices(TileDrawer::CHARACTER);
 }
 
 void PlayMode::draw(glm::uvec2 const &_drawable_size) {
@@ -165,7 +191,7 @@ void PlayMode::draw(glm::uvec2 const &_drawable_size) {
 				glm::u8vec4(0xff, 0xff, 0xff, 0x00));
 		};
 
-		draw_text(glm::vec2(-aspect + 0.1f, 0.0f), server_message, 0.09f);
+		// draw_text(glm::vec2(-aspect + 0.1f, 0.0f), server_message, 0.09f);
 
 		draw_text(glm::vec2(-aspect + 0.1f,-0.9f), "(press WASD to change your total)", 0.09f);
 	}
