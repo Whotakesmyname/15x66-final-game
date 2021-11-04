@@ -144,6 +144,8 @@ CLIENT_NAMES =
 	Sound
 	load_wav
 	load_opus
+	TileDrawer
+	DrawText
 	;
 
 SERVER_NAMES =
@@ -165,6 +167,7 @@ COMMON_NAMES =
 	Load
 	Connection
 	hex_dump
+	Collider
 	;
 
 SHOW_MESHES_NAMES =
