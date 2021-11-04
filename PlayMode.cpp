@@ -14,9 +14,7 @@
 #include <random>
 
 
-PlayMode::PlayMode(Client &client_) : client(client_) {
-	tile_drawer = TileDrawer();
-
+PlayMode::PlayMode(Client &client_) : drawable_size({1280U, 720U}), client(client_) {
 	tile_drawer.add_component(TileDrawer::Square{
 	glm::vec2(drawable_size.x / 2.f, drawable_size.y - 20), // position/center
 	glm::vec2(drawable_size.x, 40), // size (x, y)
@@ -27,13 +25,20 @@ PlayMode::PlayMode(Client &client_) : client(client_) {
 	tile_drawer.update_vertices(TileDrawer::BACKGROUND);
 
 	tile_drawer.add_component(TileDrawer::Square{
-		glm::vec2(drawable_size.x / 2, drawable_size.y - 140),
-		glm::vec2(100, 40),
+		glm::vec2(drawable_size.x / 2, drawable_size.y - 160),
+		glm::vec2(400, 40),
 		glm::vec2(),
 		glm::vec2()
 	}, TileDrawer::MAP);
 	tile_drawer.update_vertices(TileDrawer::MAP);
 
+	tile_drawer.add_component(TileDrawer::Square{
+		glm::vec2(drawable_size.x / 2 + 50, drawable_size.y - 60),
+		glm::vec2(40, 80),
+		glm::vec2(),
+		glm::vec2()
+	}, TileDrawer::CHARACTER);
+	tile_drawer.update_vertices(TileDrawer::CHARACTER);
 }
 
 PlayMode::~PlayMode() {
@@ -107,10 +112,10 @@ void PlayMode::update(float elapsed) {
 			std::cout << "[" << c->socket << "] closed (!)" << std::endl;
 			throw std::runtime_error("Lost connection to server!");
 		} else { assert(event == Connection::OnRecv);
-			std::cout << "[" << c->socket << "] recv'd data. Current buffer:\n" << hex_dump(c->recv_buffer); std::cout.flush();
+			// std::cout << "[" << c->socket << "] recv'd data. Current buffer:\n" << hex_dump(c->recv_buffer); std::cout.flush();
 			//expecting message(s) like 'm' + 3-byte length + length bytes of text:
 			while (c->recv_buffer.size() >= 4) {
-				std::cout << "[" << c->socket << "] recv'd data. Current buffer:\n" << hex_dump(c->recv_buffer); std::cout.flush();
+				// std::cout << "[" << c->socket << "] recv'd data. Current buffer:\n" << hex_dump(c->recv_buffer); std::cout.flush();
 				char type = c->recv_buffer[0];
 				if (type != 'm') {
 					throw std::runtime_error("Server sent unknown message type '" + std::to_string(type) + "'");
@@ -128,14 +133,6 @@ void PlayMode::update(float elapsed) {
 		}
 	}, 0.0);
 	
-	tile_drawer.clear_components(TileDrawer::CHARACTER);
-	tile_drawer.add_component(TileDrawer::Square{
-		glm::vec2(drawable_size.x / 2 + 50, drawable_size.y - 100),
-		glm::vec2(40, 100),
-		glm::vec2(),
-		glm::vec2()
-	}, TileDrawer::CHARACTER);
-	tile_drawer.update_vertices(TileDrawer::CHARACTER);
 }
 
 void PlayMode::draw(glm::uvec2 const &_drawable_size) {

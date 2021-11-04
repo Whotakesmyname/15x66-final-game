@@ -15,7 +15,7 @@ TileDrawer::TileDrawer() {
     program = gl_compile_program(
         "#version 330 core\n"
         "layout(location = 0) in vec2 position;\n"
-        "layout(location = 2) in vec2 tex_coord;\n"
+        "layout(location = 1) in vec2 tex_coord;\n"
         "\n"
         "out vec2 TexCoord;\n"
         "\n"
@@ -42,13 +42,18 @@ TileDrawer::TileDrawer() {
     for (size_t queue = 0; queue < RENDER_QUEUE_SIZE; ++queue) {
         glBindBuffer(GL_ARRAY_BUFFER, vbos[queue]);
         glBindVertexArray(vaos[queue]);
-        glEnableVertexAttribArray(POSTION);
         glVertexAttribPointer(POSTION, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid *)0);
-        glEnableVertexAttribArray(TEXCOORD);
+        glEnableVertexAttribArray(POSTION);
         glVertexAttribPointer(TEXCOORD, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid *)(2 * sizeof(GLfloat)));
+        glEnableVertexAttribArray(TEXCOORD);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
     }
+
+    // init uniform locations
+    PROJECTION_LOC = glGetUniformLocation(program, "PROJECTION");
+    TEX_LOC = glGetUniformLocation(program, "TEX");
+    COLOR_LOC = glGetUniformLocation(program, "COLOR");
 }
 
 TileDrawer::~TileDrawer() {
@@ -100,7 +105,6 @@ void TileDrawer::update_vertices(RenderQueues queue) {
     const GLenum drawtypes[RENDER_QUEUE_SIZE] = {GL_STATIC_DRAW, GL_STATIC_DRAW, GL_STREAM_DRAW, GL_STREAM_DRAW};
     glBufferData(GL_ARRAY_BUFFER, vertices[queue].size() * sizeof(glm::vec4), vertices[queue].data(), drawtypes[queue]);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-	GL_ERRORS();
 }
 
 void TileDrawer::update_drawable_size(glm::uvec2 _drawable_size) {
@@ -115,15 +119,10 @@ void TileDrawer::draw() {
         if (vertices[queue].empty()) {
             continue;
         }
-	GL_ERRORS();
-        glUniformMatrix4fv(glGetUniformLocation(program, "PROJECTION"), 1, GL_FALSE, glm::value_ptr(projection));
-	GL_ERRORS();
-        glUniform3f(glGetUniformLocation(program, "COLOR"), 1.f, 1.f, 1.f);
-	GL_ERRORS();
+        glUniformMatrix4fv(PROJECTION_LOC, 1, GL_FALSE, glm::value_ptr(projection));
+        glUniform3f(COLOR_LOC, 1.f, 1.f, 1.f);
         glBindVertexArray(vaos[queue]);
-	GL_ERRORS();
         glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(vertices[queue].size()));
-	GL_ERRORS();
         glBindVertexArray(0);
     }
     glUseProgram(0);

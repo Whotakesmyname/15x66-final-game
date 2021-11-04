@@ -18,7 +18,7 @@ public:
     
     enum ATTR_LOCS : GLuint {
         POSTION = 0U,
-        TEXCOORD = 2U,
+        TEXCOORD = 1U,
     };
 
     // a square with tex coord
@@ -35,6 +35,10 @@ public:
     GLuint vaos[RENDER_QUEUE_SIZE];
     GLuint program;
 
+    GLuint PROJECTION_LOC = -1U;
+    GLuint TEX_LOC = -1U;
+    GLuint COLOR_LOC = -1U;
+
     glm::mat4 projection;
 
     TileDrawer();
@@ -50,5 +54,5 @@ public:
 
     void draw();
 
-    glm::uvec2 drawable_size = {1280U, 720U};
+    glm::uvec2 drawable_size;
 };
