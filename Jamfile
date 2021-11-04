@@ -167,6 +167,7 @@ COMMON_NAMES =
 	Load
 	Connection
 	hex_dump
+	Collider
 	;
 
 SHOW_MESHES_NAMES =

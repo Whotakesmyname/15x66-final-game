@@ -1,8 +1,11 @@
+#pragma once
+
 #include "Mode.hpp"
 
 #include "Connection.hpp"
 #include "Scene.hpp"
 #include "TileDrawer.hpp"
+#include "Collider.hpp"
 
 #include <glm/glm.hpp>
 
@@ -22,6 +25,12 @@ struct PlayMode : Mode {
 	glm::vec2 drawable_size;
 
 	TileDrawer tile_drawer;
+
+	Collider collider;
+
+	const float horizontal_speed = 180.f;
+	const float jump_velocity = 250.f;
+	const float gravity_acc = 300.f;
 
 	//----- game state -----
 

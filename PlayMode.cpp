@@ -25,6 +25,7 @@ PlayMode::PlayMode(Client &client_) : drawable_size({1280U, 720U}), client(clien
 	// convert component data to vertices and push to GPU
 	tile_drawer.update_vertices(TileDrawer::BACKGROUND);
 	background.push_back(index);
+	collider.add_component(glm::vec2(drawable_size.x / 2.f, drawable_size.y - 20), glm::vec2(drawable_size.x, 40));
 
 	index = tile_drawer.add_component(TileDrawer::Square{
 		glm::vec2(drawable_size.x / 2, drawable_size.y - 160),
@@ -34,6 +35,7 @@ PlayMode::PlayMode(Client &client_) : drawable_size({1280U, 720U}), client(clien
 	}, TileDrawer::MAP);
 	tile_drawer.update_vertices(TileDrawer::MAP);
 	map_components.push_back(index);
+	collider.add_component(glm::vec2(drawable_size.x / 2, drawable_size.y - 160), glm::vec2(400, 40));
 
 	index = tile_drawer.add_component(TileDrawer::Square{
 		glm::vec2(drawable_size.x / 2 + 50, drawable_size.y - 60),
@@ -98,16 +100,39 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 }
 
 void PlayMode::update(float elapsed) {
+	bool collided;
+	{
+		// collision detection
+		auto overlap = collider.solve_collision(player.position, glm::vec2(40.f, 80.f));
+		collided = overlap.first;
+	}
 
 	glm::vec2 move = glm::vec2(0.f);
-	if (left.pressed && !right.pressed) move.x = -100.f;
-	if (!left.pressed && right.pressed) move.x = 100.f;
-	if (jump.pressed) player.velocity.y = -250.f;
+	if (left.pressed && !right.pressed) move.x = -horizontal_speed;
+	if (!left.pressed && right.pressed) move.x = horizontal_speed;
+	if (jump.pressed && collided) player.velocity.y = -jump_velocity;
 
 	// update gravity
 	player.position += move * elapsed;
 	player.position += player.velocity * elapsed;
-	player.velocity.y += 200.f * elapsed;
+	player.velocity.y += gravity_acc * elapsed;
+
+	{
+		// collision resolution
+		auto overlap = collider.solve_collision(player.position, glm::vec2(40.f, 80.f));
+
+		if (overlap.first) {
+			auto& resolve_vec = overlap.second;
+			player.velocity = glm::vec2(0.f); // eliminate velocity when collide
+			// has collision
+			if (std::abs(resolve_vec.x) <= std::abs(resolve_vec.y)) {
+				// use x dir
+				player.position.x += resolve_vec.x;
+			} else {
+				player.position.y += resolve_vec.y;
+			}
+		}
+	}
 
 	tile_drawer.components[TileDrawer::CHARACTER][self_index].position = player.position;
 
@@ -193,7 +218,7 @@ void PlayMode::draw(glm::uvec2 const &_drawable_size) {
 
 		// draw_text(glm::vec2(-aspect + 0.1f, 0.0f), server_message, 0.09f);
 
-		draw_text(glm::vec2(-aspect + 0.1f,-0.9f), "(press WASD to change your total)", 0.09f);
+		draw_text(glm::vec2(-aspect + 0.1f,-0.9f), "(press AD to move, press Space to jump)", 0.09f);
 	}
 	GL_ERRORS();
 }
