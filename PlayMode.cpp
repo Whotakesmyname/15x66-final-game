@@ -123,13 +123,20 @@ void PlayMode::update(float elapsed) {
 
 		if (overlap.first) {
 			auto& resolve_vec = overlap.second;
-			player.velocity = glm::vec2(0.f); // eliminate velocity when collide
 			// has collision
 			if (std::abs(resolve_vec.x) <= std::abs(resolve_vec.y)) {
 				// use x dir
+				player.velocity = glm::vec2(0.f); // eliminate velocity to stop on wall
 				player.position.x += resolve_vec.x;
 			} else {
 				player.position.y += resolve_vec.y;
+				if (resolve_vec.y >= 0) {
+					// touched ceil, cut off excessive speed
+					player.velocity.y = std::max(0.0001f, player.velocity.y);
+				} else {
+					// touched floor
+					player.velocity.y = std::min(0.f, player.velocity.y);
+				}
 			}
 		}
 	}
