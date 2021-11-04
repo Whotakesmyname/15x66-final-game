@@ -7,6 +7,7 @@
 #include "DrawText.hpp"
 #include "Mesh.hpp"
 #include "Load.hpp"
+#include "TileDrawer.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -14,6 +15,25 @@
 
 
 PlayMode::PlayMode(Client &client_) : client(client_) {
+	tile_drawer = TileDrawer();
+
+	tile_drawer.add_component(TileDrawer::Square{
+	glm::vec2(drawable_size.x / 2.f, drawable_size.y - 20), // position/center
+	glm::vec2(drawable_size.x, 40), // size (x, y)
+	glm::vec2(), // uv coord upper left
+	glm::vec2() // uv coord bottom right
+	}, TileDrawer::BACKGROUND); // rendering queue
+	// convert component data to vertices and push to GPU
+	tile_drawer.update_vertices(TileDrawer::BACKGROUND);
+
+	tile_drawer.add_component(TileDrawer::Square{
+		glm::vec2(drawable_size.x / 2, drawable_size.y - 140),
+		glm::vec2(100, 40),
+		glm::vec2(),
+		glm::vec2()
+	}, TileDrawer::MAP);
+	tile_drawer.update_vertices(TileDrawer::MAP);
+
 }
 
 PlayMode::~PlayMode() {
@@ -107,11 +127,24 @@ void PlayMode::update(float elapsed) {
 			}
 		}
 	}, 0.0);
+	
+	tile_drawer.clear_components(TileDrawer::CHARACTER);
+	tile_drawer.add_component(TileDrawer::Square{
+		glm::vec2(drawable_size.x / 2 + 50, drawable_size.y - 100),
+		glm::vec2(40, 100),
+		glm::vec2(),
+		glm::vec2()
+	}, TileDrawer::CHARACTER);
+	tile_drawer.update_vertices(TileDrawer::CHARACTER);
 }
 
-void PlayMode::draw(glm::uvec2 const &drawable_size) {
+void PlayMode::draw(glm::uvec2 const &_drawable_size) {
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	drawable_size = {static_cast<float>(_drawable_size.x), static_cast<float>(_drawable_size.y)};
+	tile_drawer.update_drawable_size(_drawable_size);
+	tile_drawer.draw();
 
 	{ //use DrawLines to overlay some text:
 		glDisable(GL_DEPTH_TEST);

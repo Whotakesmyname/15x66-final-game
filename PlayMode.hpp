@@ -2,6 +2,7 @@
 
 #include "Connection.hpp"
 #include "Scene.hpp"
+#include "TileDrawer.hpp"
 
 #include <glm/glm.hpp>
 
@@ -18,10 +19,9 @@ struct PlayMode : Mode {
 	virtual void draw(glm::uvec2 const &drawable_size) override;
 
 	// Game configurations
-	glm::uvec2 drawable_size;
-	glm::mat4 projection = glm::ortho(0.f, 800.f, 600.f, 0.f, -100.f, 100.f);
+	glm::vec2 drawable_size;
 
-	Scene scene;
+	TileDrawer tile_drawer;
 
 	//----- game state -----
 
